@@ -245,6 +245,8 @@ namespace ApolloPlaylist
             if (folder.Length == 0) { SetStatus("Enter a destination folder."); return; }
             downloading = true;
             startButton.Text = "Stop";
+            ascii.State = AsciiDisplay.DisplayState.Process;
+            ascii.Invalidate();
             SetStatus("Downloading…");
             StartDownload(++downloadId, url, folder);
         }
@@ -260,7 +262,15 @@ namespace ApolloPlaylist
             downloading = false;
             startButton.Text = "Download";
             startButton.Enabled = true;
-            if (!Convert.ToBoolean(data["ok"])) { SetStatus(Convert.ToString(data["error"])); return; }
+            if (!Convert.ToBoolean(data["ok"]))
+            {
+                ascii.State = AsciiDisplay.DisplayState.Ready;
+                ascii.Invalidate();
+                SetStatus(Convert.ToString(data["error"]));
+                return;
+            }
+            ascii.State = AsciiDisplay.DisplayState.Complete;
+            ascii.Invalidate();
             Dictionary<string, object> value = data["value"] as Dictionary<string, object>;
             int tracks = ResultCount(value, "tracks");
             string summary = tracks > 0

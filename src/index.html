@@ -244,7 +244,7 @@
       </header>
       <div class="body" id="window-body">
         <div class="ascii-display" aria-hidden="true">
-          <div class="ascii-display__meta"><span>APOLLO / AUDIO</span><span>OUTPUT: M4A</span></div>
+          <div class="ascii-display__meta"><span>Youtube Music Downloaded</span><span id="display-state">⬤ Ready</span></div>
           <pre class="ascii-display__logo">    _    ____   ___  _     _      ___
    / \  |  _ \ / _ \| |   | |    / _ \
   / _ \ | |_) | | | | |   | |   | | | |
@@ -295,6 +295,7 @@
       const pasteButton = document.querySelector('#paste-button');
       const browseButton = document.querySelector('#browse-button');
       const asciiBars = document.querySelector('#ascii-bars');
+      const displayState = document.querySelector('#display-state');
       const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
       let animationTimer;
       let animationStep = 0;
@@ -320,6 +321,7 @@
         };
         chrome.webview.addEventListener('message', ({ data }) => {
           if (data.type === 'ready') {
+            displayState.textContent = '⬤ Ready';
             setStatus('Ready. Enter a playlist URL and choose a folder.');
           } else if (data.type === 'progress') {
             setStatus(data.message, 'loading');
@@ -447,6 +449,7 @@
         if (!window.apolloDownloader?.download) return setStatus('Desktop downloader is not connected yet.', 'error');
         downloading = true;
         startButton.textContent = 'Stop';
+        displayState.textContent = '▶ Process';
         setStatus('Downloadingâ€¦', 'loading');
         try {
           const result = await window.apolloDownloader.download({ url, folder });
@@ -456,8 +459,10 @@
               + (result.lyricsFailed ? ` Failed for ${result.lyricsFailed}: ${result.lyricsError}` : '')
             : ' No audio files reported for lyrics.';
           const folderStatus = result?.openError ? ` Could not open folder: ${result.openError}` : '';
+          displayState.textContent = '⬤ Complete';
           setStatus(`Download complete.${lyricStatus}${folderStatus}`, result?.lyricsFailed || result?.openError ? 'error' : 'idle');
         } catch (error) {
+          displayState.textContent = '⬤ Ready';
           setStatus(error?.message || 'Download failed. Please try again.', 'error');
         } finally {
           downloading = false;

@@ -6,6 +6,8 @@ namespace ApolloPlaylist
 {
     internal sealed class AsciiDisplay : Control
     {
+        internal enum DisplayState { Ready, Process, Complete }
+
         private static readonly string[] Logo = {
             "    _    ____   ___  _     _      ___",
             "   / \\  |  _ \\ / _ \\| |   | |    / _ \\",
@@ -15,6 +17,7 @@ namespace ApolloPlaylist
         };
         private int step;
         internal bool Light { get; set; }
+        internal DisplayState State { get; set; }
 
         internal AsciiDisplay()
         {
@@ -43,8 +46,10 @@ namespace ApolloPlaylist
             using (Font art = new Font("Consolas", 10f, FontStyle.Bold))
             using (Font bars = new Font("Consolas", 9f))
             {
-                TextRenderer.DrawText(g, "APOLLO / AUDIO", meta, new Point(9, 8), muted, TextFormatFlags.NoPadding);
-                TextRenderer.DrawText(g, "OUTPUT: M4A", meta, new Rectangle(350, 8, 116, 14), muted,
+                TextRenderer.DrawText(g, "Youtube Music Downloaded", meta, new Point(9, 8), muted, TextFormatFlags.NoPadding);
+                string stateText = State == DisplayState.Process ? "\u25B6 Process"
+                    : State == DisplayState.Complete ? "\u2B24 Complete" : "\u2B24 Ready";
+                TextRenderer.DrawText(g, stateText, meta, new Rectangle(350, 8, 116, 14), muted,
                     TextFormatFlags.Right | TextFormatFlags.NoPadding);
                 for (int i = 0; i < Logo.Length; i++)
                     TextRenderer.DrawText(g, Logo[i], art, new Rectangle(12, 30 + i * 15, Width - 24, 18), ink,
