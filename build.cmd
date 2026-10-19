@@ -5,16 +5,16 @@ if not exist "%CSC%" (
   echo .NET Framework 4 compiler was not found.
   exit /b 1
 )
-if not exist "%~dp0sound.ogg" (
-  echo sound.ogg was not found.
+if not exist "%~dp0assets\sound.ogg" (
+  echo assets\sound.ogg was not found.
   exit /b 1
 )
-if not exist "%~dp0src\ascii.gif" (
-  echo ascii.gif was not found.
+if not exist "%~dp0assets\ascii.gif" (
+  echo assets\ascii.gif was not found.
   exit /b 1
 )
-if not exist "%~dp0src\icon.ico" (
-  echo icon.ico was not found. Run python tools\icon.py to generate it.
+if not exist "%~dp0assets\icon.ico" (
+  echo assets\icon.ico was not found. Run python tools\icon.py to generate it.
   exit /b 1
 )
 where ffmpeg >nul 2>&1
@@ -23,13 +23,13 @@ if errorlevel 1 (
   exit /b 1
 )
 set "AUDIO_WAV=%TEMP%\Apollo-Ship-%RANDOM%-%RANDOM%.wav"
-ffmpeg -hide_banner -loglevel error -nostdin -y -i "%~dp0sound.ogg" -map 0:a:0 -vn -ac 2 -ar 28000 -c:a pcm_s16le -map_metadata -1 "%AUDIO_WAV%"
+ffmpeg -hide_banner -loglevel error -nostdin -y -i "%~dp0assets\sound.ogg" -map 0:a:0 -vn -ac 2 -ar 28000 -c:a pcm_s16le -map_metadata -1 "%AUDIO_WAV%"
 if errorlevel 1 (
   if exist "%AUDIO_WAV%" del /q "%AUDIO_WAV%"
   exit /b 1
 )
 if not exist "%~dp0dist" mkdir "%~dp0dist"
-"%CSC%" /nologo /target:winexe /platform:x64 /optimize+ "/win32manifest:%~dp0src\app.manifest" "/win32icon:%~dp0src\icon.ico" "/out:%~dp0dist\Apollo-Ship.exe" "/resource:%AUDIO_WAV%,ApolloShip.Loop" "/resource:%~dp0src\ascii.gif,ApolloShip.Ascii" /r:System.Windows.Forms.dll /r:System.Drawing.dll /r:System.Core.dll /r:System.Web.Extensions.dll "%~dp0src\App.cs" "%~dp0src\NativeUi.cs"
+"%CSC%" /nologo /target:winexe /platform:x64 /optimize+ "/win32manifest:%~dp0src\app.manifest" "/win32icon:%~dp0assets\icon.ico" "/out:%~dp0dist\Apollo-Ship.exe" "/resource:%AUDIO_WAV%,ApolloShip.Loop" "/resource:%~dp0assets\ascii.gif,ApolloShip.Ascii" /r:System.Windows.Forms.dll /r:System.Drawing.dll /r:System.Core.dll /r:System.Web.Extensions.dll "%~dp0src\AssemblyInfo.cs" "%~dp0src\App.cs" "%~dp0src\NativeUi.cs"
 set "BUILD_RESULT=%ERRORLEVEL%"
 del /q "%AUDIO_WAV%"
 if not "%BUILD_RESULT%"=="0" exit /b %BUILD_RESULT%

@@ -6,8 +6,8 @@ from PIL import Image
 
 
 ROOT = Path(__file__).resolve().parents[1]
-SOURCE = ROOT / "icon.png"
-OUTPUT = ROOT / "src" / "icon.ico"
+SOURCE = ROOT / "assets" / "icon.png"
+OUTPUT = ROOT / "assets" / "icon.ico"
 SIZES = (16, 24, 32, 48, 64, 128, 256)
 
 

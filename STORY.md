@@ -10,7 +10,7 @@ We started with an HTML template and reference images of old keygen interfaces. 
 
 The window became fixed-size, with no resize or zoom. Dark mode became the default. Labels were made non-selectable while the two inputs kept normal copy and paste. We added a Paste button for the URL, Browse for the folder, animated ASCII art, and a concise progress line that truncates long messages instead of creating a horizontal scrollbar. When processing finishes, the destination opens in File Explorer.
 
-The design took several passes because a plain black form did not feel like the references. Thin double borders, scan lines, monospace type, and the moving bar pattern gave it a more specific identity. The HTML design survives in [src/index.html](src/index.html) as a standalone visual preview.
+The design took several passes because a plain black form did not feel like the references. Thin double borders, scan lines, monospace type, and the moving bar pattern gave it a more specific identity. The HTML design survives in [preview/index.html](preview/index.html) as a standalone visual preview.
 
 ## Trying Electron, then setting a size limit
 
@@ -38,10 +38,10 @@ The first memory concern was the browser-based version, but we also noticed the 
 
 Over 40 seconds, the animation-on probe's managed heap grew by about 4 MB; the animation-off probe grew by about 1 MB. We then cached the static display and drew only the moving bars each frame. In the same probe, animation-on growth fell to about 1.9 MB. An accelerated run showed the managed heap dropping from 6.4 MB to 1.4 MB when garbage collection ran. That showed temporary redraw allocations being reclaimed; it did not establish an unbounded leak or promise a flat Task Manager reading from the first second.
 
-Later, we removed the light theme and replaced the custom display control with an embedded [animated GIF](src/ascii.gif). The download state remains a separate text label so it can still change between Ready, Process, and Complete. The HTML preview uses the same GIF and a still frame for reduced-motion settings. This removes the app's own frame timer and drawing code; Windows still paints the GIF frames.
+Later, we removed the light theme and replaced the custom display control with an embedded [animated GIF](assets/ascii.gif). The download state remains a separate text label so it can still change between Ready, Process, and Complete. The HTML preview uses the same GIF and a still frame for reduced-motion settings. This removes the app's own frame timer and drawing code; Windows still paints the GIF frames.
 
 ## Where it stands
 
-Apollo Ship now also plays a short loop from [sound.ogg](sound.ogg) while its window is open. The build converts that source to WAV and embeds it, so playback needs no separate audio file.
+Apollo Ship now also plays a short loop from [assets/sound.ogg](assets/sound.ogg) while its window is open. The build converts that source to WAV and embeds it, so playback needs no separate audio file.
 
-Apollo Ship is a single [Windows EXE](dist/Apollo-Ship.exe) built by [build.cmd](build.cmd). The current file is 973,312 bytes, below the 1 MB launcher target. The embedded sound uses 28 kHz stereo PCM, and the Windows icon comes from [icon.png](icon.png). yt-dlp, FFmpeg, and FFprobe remain external tools for downloading, and FFmpeg is needed when building the embedded sound. The native app is the runnable product; the HTML file is a design preview. [README.md](README.md) covers setup and use, while this file records why the app took this route.
+For version 0.1.0, we separated C# code in [src/](src), media in [assets/](assets), and the design preview in [preview/](preview). Apollo Ship is a single [Windows EXE](dist/Apollo-Ship.exe) built by [build.cmd](build.cmd). Its sound uses 28 kHz stereo PCM, and the Windows icon comes from [assets/icon.png](assets/icon.png). yt-dlp, FFmpeg, and FFprobe remain external tools for downloading, and FFmpeg is needed when building the embedded sound. The native app is the runnable product; the HTML file is a design preview. [README.md](README.md) covers setup and use, while this file records why the app took this route.

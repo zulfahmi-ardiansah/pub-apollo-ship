@@ -7,8 +7,8 @@ from PIL import Image, ImageDraw, ImageFont
 
 
 ROOT = Path(__file__).resolve().parents[1]
-OUTPUT = ROOT / "src" / "ascii.gif"
-STILL = ROOT / "src" / "ascii.png"
+OUTPUT = ROOT / "assets" / "ascii.gif"
+STILL = ROOT / "assets" / "ascii.png"
 FONT = Path("C:/Windows/Fonts/consola.ttf")
 BOLD_FONT = Path("C:/Windows/Fonts/consolab.ttf")
 WIDTH, HEIGHT = 480, 161

@@ -3,7 +3,7 @@
 **Apollo Ship** is a small Windows app that saves YouTube Music playlists as local M4A files for listening in your own music player.
 
 ![Language](https://img.shields.io/badge/language-C%23-239120?style=flat-square&logo=csharp&logoColor=white)
-![Version](https://img.shields.io/badge/version-unversioned-6B7280?style=flat-square)
+![Version](https://img.shields.io/badge/version-0.1.0-blue?style=flat-square)
 
 I use YouTube Premium, but sometimes I want to listen offline in Poweramp with my custom equalizer. I wanted the files for the player I already use, so I built a downloader instead of another music player. The fixed window and animated ASCII art bring back the feel of old keygen programs.
 
@@ -63,7 +63,7 @@ Run this from the repository root in PowerShell:
 .\build.cmd
 ```
 
-The script uses the Windows .NET Framework compiler and FFmpeg on `PATH` to convert [sound.ogg](sound.ogg) into an embedded WAV resource. It embeds [src/ascii.gif](src/ascii.gif), adds [src/icon.ico](src/icon.ico) as the Windows application icon, creates one x64 EXE in `dist`, and fails if the EXE exceeds 1 MB. FFmpeg is needed to build the sound, but the finished EXE plays it without an external audio file or decoder. To regenerate the GIF and preview still image, run `python tools/ascii.py` with Pillow installed. To regenerate the ICO from [icon.png](icon.png), run `python tools/icon.py`.
+The script uses the Windows .NET Framework compiler and FFmpeg on `PATH` to convert [assets/sound.ogg](assets/sound.ogg) into an embedded WAV resource. It embeds [assets/ascii.gif](assets/ascii.gif), adds [assets/icon.ico](assets/icon.ico) as the Windows application icon, creates one x64 EXE in `dist`, and fails if the EXE exceeds 1 MB. FFmpeg is needed to build the sound, but the finished EXE plays it without an external audio file or decoder. To regenerate the GIF and preview still image, run `python tools/ascii.py` with Pillow installed. To regenerate the ICO from [assets/icon.png](assets/icon.png), run `python tools/icon.py`.
 
 There is no automated test suite in this repository. A successful build confirms compilation and the EXE size check; it does not test a live playlist download.
 
@@ -71,18 +71,18 @@ There is no automated test suite in this repository. A successful build confirms
 
 | Path | Purpose |
 | --- | --- |
-| [src/NativeUi.cs](src/NativeUi.cs) | Native Windows window and controls. |
-| [src/ascii.gif](src/ascii.gif) | Animated ASCII display embedded in the EXE. |
-| [src/ascii.png](src/ascii.png) | Still frame used by the HTML preview when reduced motion is requested. |
-| [tools/ascii.py](tools/ascii.py) | Regenerates the GIF and reduced-motion preview image. |
-| [icon.png](icon.png) | Source image for the Windows application icon. |
-| [src/icon.ico](src/icon.ico) | Multi-size icon embedded in the EXE. |
-| [tools/icon.py](tools/icon.py) | Regenerates the ICO from the source PNG. |
-| [src/App.cs](src/App.cs) | Download process and lyric embedding. |
-| [sound.ogg](sound.ogg) | Source audio embedded in the EXE during the build. |
-| [src/index.html](src/index.html) | Standalone visual preview; the EXE does not load it. |
+| [src/](src) | WinForms UI, downloader, manifest, and version metadata. |
+| [assets/](assets) | Chiptune, pixel icon, and ASCII animation sources and build assets. |
+| [preview/index.html](preview/index.html) | Standalone visual preview; the EXE does not load it. |
+| [tools/](tools) | Scripts that regenerate the GIF, still image, and ICO. |
 | [command.txt](command.txt) | Reference yt-dlp command and output naming. |
 | [build.cmd](build.cmd) | Compiles the EXE and checks its size. |
+
+## Credits and assets
+
+I made the animated ASCII artwork, drew the pixel icon, and created the looping chiptune for Apollo Ship. The chiptune is a happy variation on the chords of **“Mosi Tidak Percaya” by Efek Rumah Kaca**.
+
+Apollo Ship uses [yt-dlp](https://github.com/yt-dlp/yt-dlp) as its external download tool. Credit for yt-dlp goes to its contributors; it is installed separately and is not bundled in the EXE.
 
 ## Troubleshooting
 
