@@ -2,6 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
+using System.IO;
+using System.Media;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Web.Script.Serialization;
 using System.Windows.Forms;
@@ -43,6 +46,8 @@ namespace ApolloPlaylist
         private readonly Panel urlBox, folderBox;
         private readonly Button themeButton, minimizeButton, closeButton, pasteButton, browseButton, startButton;
         private readonly AsciiDisplay ascii;
+        private SoundPlayer loopPlayer;
+        private Stream loopStream;
         private bool lightTheme;
         private bool downloading;
 
@@ -86,9 +91,42 @@ namespace ApolloPlaylist
             animation.Tick += delegate { ascii.Advance(); };
             animation.Start();
             Resize += delegate { animation.Enabled = WindowState != FormWindowState.Minimized; };
-            FormClosing += delegate { StopDownload(); };
+            Shown += delegate { StartLoopSound(); };
+            FormClosing += delegate { StopLoopSound(); StopDownload(); };
             KeyDown += delegate(object sender, KeyEventArgs args) { if (args.KeyCode == Keys.Escape && !downloading) Close(); };
             Theme(false);
+        }
+
+        private void StartLoopSound()
+        {
+            try
+            {
+                loopStream = Assembly.GetExecutingAssembly().GetManifestResourceStream("ApolloShip.Loop");
+                if (loopStream == null) throw new InvalidOperationException("Embedded audio was not found.");
+                loopPlayer = new SoundPlayer(loopStream);
+                loopPlayer.Load();
+                loopPlayer.PlayLooping();
+            }
+            catch (Exception error)
+            {
+                StopLoopSound();
+                SetStatus("Audio could not play: " + error.Message);
+            }
+        }
+
+        private void StopLoopSound()
+        {
+            if (loopPlayer != null)
+            {
+                loopPlayer.Stop();
+                loopPlayer.Dispose();
+                loopPlayer = null;
+            }
+            if (loopStream != null)
+            {
+                loopStream.Dispose();
+                loopStream = null;
+            }
         }
 
         private Label Label(string text, int x, int y, int width, int height, Font font)
