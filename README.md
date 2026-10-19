@@ -27,8 +27,19 @@ The window shows one-line progress and lets you stop a download. It has a fixed 
 ## Installation
 
 1. Use the included [Windows EXE](dist/Apollo-Ship.exe), or [build it from source](#build-from-source).
-2. Place `yt-dlp.exe`, `ffmpeg.exe`, and `ffprobe.exe` beside the app EXE, or add their folders to `PATH`. Keep FFmpeg and FFprobe together.
-3. Set up the JavaScript runtime according to the yt-dlp guide above if it is not already available.
+2. Download the [Apollo tools ZIP](https://drive.google.com/file/d/1d2ydFRQ9A68X8yDcQGMgbGSh4733qyV0/view). It contains `yt-dlp.exe`, `ffmpeg.exe`, `ffprobe.exe`, and `ffplay.exe`. The app needs the first three; `ffplay.exe` is optional.
+3. Extract the ZIP to a permanent folder, such as `C:\Tools\Apollo`. The EXE files should be directly inside that folder. Do not add the ZIP file itself to `PATH`.
+4. In Windows, search for **Edit environment variables for your account**. Under **User variables**, select **Path** → **Edit** → **New**, add the folder containing the EXE files (for example, `C:\Tools\Apollo`), and confirm the dialogs. Open a new PowerShell window and check:
+
+   ```powershell
+   where.exe yt-dlp
+   where.exe ffmpeg
+   where.exe ffprobe
+   ```
+
+5. Set up a supported JavaScript runtime according to the [yt-dlp EJS guide](https://github.com/yt-dlp/yt-dlp/wiki/EJS) if it is not already available. The ZIP above does not include one.
+
+You can also get yt-dlp and FFmpeg from the official links in [Requirements](#requirements). Apollo Ship checks beside its EXE first, then `PATH`; keep FFmpeg and FFprobe together whichever method you choose.
 
 The app itself needs no account, API key, or configuration file. Both input fields start empty.
 
