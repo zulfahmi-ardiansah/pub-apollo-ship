@@ -15,7 +15,7 @@ if errorlevel 1 (
   exit /b 1
 )
 set "AUDIO_WAV=%TEMP%\Apollo-Ship-%RANDOM%-%RANDOM%.wav"
-ffmpeg -hide_banner -loglevel error -nostdin -y -i "%~dp0sound.ogg" -map 0:a:0 -vn -ac 2 -ar 22050 -c:a pcm_s16le -map_metadata -1 "%AUDIO_WAV%"
+ffmpeg -hide_banner -loglevel error -nostdin -y -i "%~dp0sound.ogg" -map 0:a:0 -vn -ac 2 -ar 28000 -c:a pcm_s16le -map_metadata -1 "%AUDIO_WAV%"
 if errorlevel 1 (
   if exist "%AUDIO_WAV%" del /q "%AUDIO_WAV%"
   exit /b 1
