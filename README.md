@@ -63,7 +63,7 @@ Run this from the repository root in PowerShell:
 .\build.cmd
 ```
 
-The script uses the Windows .NET Framework compiler and FFmpeg on `PATH` to convert [sound.ogg](sound.ogg) into an embedded WAV resource. It embeds [src/ascii.gif](src/ascii.gif), creates one x64 EXE in `dist`, and fails if the EXE exceeds 1 MB. FFmpeg is needed to build the sound, but the finished EXE plays it without an external audio file or decoder. To regenerate the GIF and preview still image, run `python tools/ascii.py` with Pillow installed.
+The script uses the Windows .NET Framework compiler and FFmpeg on `PATH` to convert [sound.ogg](sound.ogg) into an embedded WAV resource. It embeds [src/ascii.gif](src/ascii.gif), adds [src/icon.ico](src/icon.ico) as the Windows application icon, creates one x64 EXE in `dist`, and fails if the EXE exceeds 1 MB. FFmpeg is needed to build the sound, but the finished EXE plays it without an external audio file or decoder. To regenerate the GIF and preview still image, run `python tools/ascii.py` with Pillow installed. To regenerate the ICO from [icon.png](icon.png), run `python tools/icon.py`.
 
 There is no automated test suite in this repository. A successful build confirms compilation and the EXE size check; it does not test a live playlist download.
 
@@ -75,6 +75,9 @@ There is no automated test suite in this repository. A successful build confirms
 | [src/ascii.gif](src/ascii.gif) | Animated ASCII display embedded in the EXE. |
 | [src/ascii.png](src/ascii.png) | Still frame used by the HTML preview when reduced motion is requested. |
 | [tools/ascii.py](tools/ascii.py) | Regenerates the GIF and reduced-motion preview image. |
+| [icon.png](icon.png) | Source image for the Windows application icon. |
+| [src/icon.ico](src/icon.ico) | Multi-size icon embedded in the EXE. |
+| [tools/icon.py](tools/icon.py) | Regenerates the ICO from the source PNG. |
 | [src/App.cs](src/App.cs) | Download process and lyric embedding. |
 | [sound.ogg](sound.ogg) | Source audio embedded in the EXE during the build. |
 | [src/index.html](src/index.html) | Standalone visual preview; the EXE does not load it. |

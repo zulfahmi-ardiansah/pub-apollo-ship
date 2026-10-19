@@ -45,6 +45,7 @@ namespace ApolloPlaylist
         private readonly Panel urlBox, folderBox;
         private readonly Button minimizeButton, closeButton, pasteButton, browseButton, startButton;
         private readonly PictureBox ascii;
+        private readonly Icon appIcon;
         private readonly Stream displayStream;
         private readonly Image displayImage;
         private SoundPlayer loopPlayer;
@@ -54,6 +55,8 @@ namespace ApolloPlaylist
         internal PlaylistWindow()
         {
             Text = "Apollo Ship";
+            appIcon = System.Drawing.Icon.ExtractAssociatedIcon(Assembly.GetExecutingAssembly().Location);
+            Icon = appIcon;
             StartPosition = FormStartPosition.CenterScreen;
             FormBorderStyle = FormBorderStyle.None;
             AutoScaleMode = AutoScaleMode.Dpi;
@@ -92,7 +95,7 @@ namespace ApolloPlaylist
 
             Shown += delegate { StartLoopSound(); };
             FormClosing += delegate { StopLoopSound(); StopDownload(); };
-            FormClosed += delegate { ascii.Image = null; displayImage.Dispose(); displayStream.Dispose(); };
+            FormClosed += delegate { ascii.Image = null; displayImage.Dispose(); displayStream.Dispose(); appIcon.Dispose(); };
             KeyDown += delegate(object sender, KeyEventArgs args) { if (args.KeyCode == Keys.Escape && !downloading) Close(); };
             ApplyDarkTheme();
         }
