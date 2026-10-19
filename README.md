@@ -26,7 +26,7 @@ The window shows one-line progress and lets you stop a download. It has a fixed 
 
 ## Installation
 
-1. Use the included [Windows EXE](dist/Apollo%20Ship.exe), or [build it from source](#build-from-source).
+1. Use the included [Windows EXE](dist/Apollo-Ship.exe), or [build it from source](#build-from-source).
 2. Place `yt-dlp.exe`, `ffmpeg.exe`, and `ffprobe.exe` beside the app EXE, or add their folders to `PATH`. Keep FFmpeg and FFprobe together.
 3. Set up the JavaScript runtime according to the yt-dlp guide above if it is not already available.
 
@@ -37,7 +37,7 @@ The app itself needs no account, API key, or configuration file. Both input fiel
 From the repository root in PowerShell, start the desktop app:
 
 ```powershell
-& ".\dist\Apollo Ship.exe"
+& ".\dist\Apollo-Ship.exe"
 ```
 
 1. Paste a YouTube Music playlist URL into **Playlist URL**. The **Paste** button reads the clipboard.

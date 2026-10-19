@@ -46,7 +46,7 @@ namespace ApolloPlaylist
             using (Font art = new Font("Consolas", 10f, FontStyle.Bold))
             using (Font bars = new Font("Consolas", 9f))
             {
-                TextRenderer.DrawText(g, "Youtube Music Downloaded", meta, new Point(9, 8), muted, TextFormatFlags.NoPadding);
+                TextRenderer.DrawText(g, "Youtube Music Downloader", meta, new Point(9, 8), muted, TextFormatFlags.NoPadding);
                 string stateText = State == DisplayState.Process ? "\u25B6 Process"
                     : State == DisplayState.Complete ? "\u2B24 Complete" : "\u2B24 Ready";
                 TextRenderer.DrawText(g, stateText, meta, new Rectangle(350, 8, 116, 14), muted,
