@@ -79,7 +79,7 @@ namespace ApolloPlaylist
             displayState = new Label { Text = "\u25CF Ready", Location = new Point(350, 8), Size = new Size(116, 15), TextAlign = ContentAlignment.MiddleRight, BackColor = Color.FromArgb(8, 8, 8), ForeColor = Color.FromArgb(194, 194, 194), Font = smallFont };
             ascii.Controls.Add(displayState);
             Controls.Add(ascii);
-            urlLabel = Label("PLAYLIST URL", 51, 266, 450, 17, boldFont);
+            urlLabel = Label("PLAYLIST/ALBUM URL", 51, 266, 450, 17, boldFont);
             urlBox = Input(51, 285, out urlInput);
             pasteButton = Button("Paste", 437, 285, 72, 44, smallFont, delegate { Paste(); });
             folderLabel = Label("SAVE TO FOLDER", 51, 360, 450, 17, boldFont);
@@ -248,7 +248,7 @@ namespace ApolloPlaylist
                 if (value.Length == 0) { SetStatus("Clipboard has no text."); return; }
                 urlInput.Text = value;
                 urlInput.Focus();
-                SetStatus("Playlist URL pasted.");
+                SetStatus("Playlist/Album URL pasted.");
             }
             catch (Exception error) { SetStatus("Could not read clipboard: " + error.Message); }
         }

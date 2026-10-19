@@ -186,7 +186,7 @@
         </div>
         <form id="download-form" novalidate>
           <div class="field">
-            <label class="field__label" for="playlist-url">Playlist URL</label>
+            <label class="field__label" for="playlist-url">Playlist/Album URL</label>
             <div class="field__control">
               <input class="field__input" id="playlist-url" name="playlistUrl" type="url" required spellcheck="false" autocomplete="off" />
               <button class="field__button" id="paste-button" type="button">Paste</button>
@@ -248,7 +248,7 @@
         chrome.webview.addEventListener('message', ({ data }) => {
           if (data.type === 'ready') {
             displayState.textContent = '⬤ Ready';
-            setStatus('Ready. Enter a playlist URL and choose a folder.');
+            setStatus('Ready. Enter a playlist/Album URL and choose a folder.');
           } else if (data.type === 'progress') {
             setStatus(data.message, 'loading');
           } else if (data.type === 'result') {
@@ -283,7 +283,7 @@
           if (!value?.trim()) return setStatus('Clipboard has no text.', 'error');
           playlistInput.value = value.trim();
           playlistInput.focus();
-          setStatus('Playlist URL pasted.');
+          setStatus('Playlist/Album URL pasted.');
         } catch (error) {
           setStatus(error?.message || 'Clipboard is unavailable.', 'error');
         }
@@ -335,7 +335,7 @@
         }
         const url = playlistInput.value.trim();
         const folder = folderInput.value.trim();
-        if (!url || !/^https?:\/\//i.test(url)) return setStatus('Enter a valid playlist URL.', 'error');
+        if (!url || !/^https?:\/\//i.test(url)) return setStatus('Enter a valid playlist/Album URL.', 'error');
         if (!folder) return setStatus('Enter a destination folder.', 'error');
         if (!window.apolloDownloader?.download) return setStatus('Desktop downloader is not connected yet.', 'error');
         downloading = true;

@@ -1,17 +1,23 @@
 ﻿# Apollo Ship
 
-**Apollo Ship** is a small Windows app that saves YouTube Music playlists as local M4A files for listening in your own music player.
+**Apollo Ship** is a small Windows app that saves YouTube Music playlists and albums as local M4A files for listening in your own music player.
 
 ![Language](https://img.shields.io/badge/language-C%23-239120?style=flat-square&logo=csharp&logoColor=white)
 ![Version](https://img.shields.io/badge/version-0.1.0-blue?style=flat-square)
 
 I use YouTube Premium, but sometimes I want to listen offline in Poweramp with my custom equalizer. I wanted the files for the player I already use, so I built a downloader instead of another music player. The fixed window and animated ASCII art bring back the feel of old keygen programs.
 
-Apollo Ship accepts a playlist URL. It does not sign in to YouTube or use a Premium session; an external `yt-dlp.exe` handles the download.
+![Apollo Ship desktop app with playlist or album URL and destination folder fields](screenshot.png)
+
+Apollo Ship accepts a playlist or album URL. It does not sign in to YouTube or use a Premium session; an external `yt-dlp.exe` handles the download.
+
+## Disclaimer
+
+I recommend buying music or streaming through YouTube Music to support the artists. Apollo Ship is a personal experiment for offline listening. If you enjoy an album, consider buying it digitally or on CD when you can.
 
 ## How it works
 
-1. Enter a YouTube Music playlist URL and choose a destination folder.
+1. Enter a YouTube Music playlist or album URL and choose a destination folder.
 2. `yt-dlp` downloads the audio as M4A, adds cover art and metadata, and writes playlist track numbers. If available, it saves English, Japanese, and Indonesian subtitles as separate SRT files.
 3. Apollo Ship looks up each downloaded track on LRCLIB. When the title, artist, album, and duration match, it uses FFmpeg to embed plain lyrics in the M4A. A track without a match keeps its audio unchanged.
 4. When processing finishes, the destination opens in File Explorer.
@@ -22,7 +28,7 @@ The window shows one-line progress and lets you stop a download. It has a fixed 
 
 - Windows 10 or 11, x64, with .NET Framework 4.7 or newer.
 - [`yt-dlp.exe`](https://github.com/yt-dlp/yt-dlp/releases), `ffmpeg.exe`, and `ffprobe.exe` from an [FFmpeg build](https://ffmpeg.org/download.html). The app looks beside its EXE first, then on `PATH`. FFmpeg and FFprobe must be in the same folder.
-- Internet access for the playlist download and LRCLIB lyric lookup. For full YouTube support, yt-dlp also needs a supported JavaScript runtime; its [EJS setup guide](https://github.com/yt-dlp/yt-dlp/wiki/EJS) recommends Deno.
+- Internet access for the playlist or album download and LRCLIB lyric lookup. For full YouTube support, yt-dlp also needs a supported JavaScript runtime; its [EJS setup guide](https://github.com/yt-dlp/yt-dlp/wiki/EJS) recommends Deno.
 
 ## Installation
 
@@ -51,10 +57,14 @@ From the repository root in PowerShell, start the desktop app:
 & ".\dist\Apollo-Ship.exe"
 ```
 
-1. Paste a YouTube Music playlist URL into **Playlist URL**. The **Paste** button reads the clipboard.
+Open the playlist or album in YouTube Music and copy the full URL from your browser's address bar (outlined in red below).
+
+![YouTube Music page with the browser address bar highlighted to show the URL to copy](direction.png)
+
+1. Paste a YouTube Music playlist or album URL into **Playlist/Album URL**. The **Paste** button reads the clipboard.
 2. Choose a destination with **Browse**, or type a folder path in **Save to folder**.
 3. Select **Download**. The button changes to **Stop** while processing. The status line shortens long messages; hover over it to read the full text.
-4. When download and lyric processing finish, File Explorer opens the destination folder. Look for M4A files under the playlist uploader and album folders.
+4. When download and lyric processing finish, File Explorer opens the destination folder. Look for M4A files under the uploader and album folders.
 
 ## Output structure
 
@@ -76,7 +86,7 @@ Run this from the repository root in PowerShell:
 
 The script uses the Windows .NET Framework compiler and FFmpeg on `PATH` to convert [assets/sound.ogg](assets/sound.ogg) into an embedded WAV resource. It embeds [assets/ascii.gif](assets/ascii.gif), adds [assets/icon.ico](assets/icon.ico) as the Windows application icon, creates one x64 EXE in `dist`, and fails if the EXE exceeds 1 MB. FFmpeg is needed to build the sound, but the finished EXE plays it without an external audio file or decoder. To regenerate the GIF and preview still image, run `python tools/ascii.py` with Pillow installed. To regenerate the ICO from [assets/icon.png](assets/icon.png), run `python tools/icon.py`.
 
-There is no automated test suite in this repository. A successful build confirms compilation and the EXE size check; it does not test a live playlist download.
+There is no automated test suite in this repository. A successful build confirms compilation and the EXE size check; it does not test a live playlist or album download.
 
 ## Project structure
 
@@ -97,9 +107,32 @@ Apollo Ship uses [yt-dlp](https://github.com/yt-dlp/yt-dlp) as its external down
 
 ## Troubleshooting
 
-| Symptom | What to check |
-| --- | --- |
-| The app asks for yt-dlp, FFmpeg, or FFprobe | Confirm the three EXEs are beside the app EXE or on `PATH`, then start the app again. |
-| The app says FFmpeg and FFprobe must be in the same folder | Move `ffmpeg.exe` and `ffprobe.exe` into one folder, then retry. |
-| yt-dlp reports a YouTube JavaScript challenge | Follow the [yt-dlp EJS setup guide](https://github.com/yt-dlp/yt-dlp/wiki/EJS) for a supported JavaScript runtime and its solver components. |
-| Music downloads but lyrics are missing | Check the final status for **No LRCLIB match** or **Failed**. SRT subtitles do not become embedded lyrics; the app only adds them when LRCLIB returns a close metadata match. |
+### yt-dlp, FFmpeg, or FFprobe not found
+
+**Cause:** Apollo Ship cannot find one or more of the required EXEs beside the app or on `PATH`.
+
+**Solution:**
+
+- Put `yt-dlp.exe`, `ffmpeg.exe`, and `ffprobe.exe` beside `Apollo-Ship.exe`, or add their folder to `PATH` as described in [Installation](#installation).
+- Restart Apollo Ship after changing `PATH`.
+
+### FFmpeg and FFprobe are in different folders
+
+**Cause:** Apollo Ship found `ffmpeg.exe` and `ffprobe.exe` in different folders.
+
+**Solution:** Put both EXEs in the same folder, then retry.
+
+### YouTube JavaScript challenge
+
+**Cause:** yt-dlp could not complete the challenge with the installed JavaScript runtime or solver components.
+
+**Solution:** Follow the [yt-dlp EJS setup guide](https://github.com/yt-dlp/yt-dlp/wiki/EJS) to set up a supported runtime and solver, then retry.
+
+### Music downloads, but lyrics are missing
+
+**Cause:** LRCLIB found no close match, embedding failed, or your player does not show plain lyrics stored in M4A metadata. SRT subtitles are separate files.
+
+**Solution:**
+
+- Check the final status for **No LRCLIB match** or **Failed**.
+- If lyrics were added but do not appear, check whether your player supports plain lyrics in M4A files.
