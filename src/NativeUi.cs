@@ -48,7 +48,7 @@ namespace ApolloPlaylist
 
         internal PlaylistWindow()
         {
-            Text = "YT Music Download";
+            Text = "Apollo Ship";
             StartPosition = FormStartPosition.CenterScreen;
             FormBorderStyle = FormBorderStyle.None;
             AutoScaleMode = AutoScaleMode.Dpi;
@@ -58,7 +58,7 @@ namespace ApolloPlaylist
             DoubleBuffered = true;
             KeyPreview = true;
 
-            titleLabel = Label("YT MUSIC DOWNLOAD", 34, 29, 345, 22, boldFont);
+            titleLabel = Label("APOLLO SHIP", 34, 29, 345, 22, boldFont);
             titleLabel.MouseDown += DragWindow;
             themeButton = Button("LIGHT", 388, 18, 63, 42, smallFont, delegate { Theme(!lightTheme); });
             minimizeButton = Button("_", 452, 18, 43, 42, boldFont, delegate { WindowState = FormWindowState.Minimized; });
