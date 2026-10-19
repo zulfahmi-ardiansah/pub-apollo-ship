@@ -6,7 +6,7 @@ if not exist "%CSC%" (
   exit /b 1
 )
 if not exist "%~dp0dist" mkdir "%~dp0dist"
-"%CSC%" /nologo /target:winexe /platform:x64 /optimize+ "/win32manifest:%~dp0src\app.manifest" "/out:%~dp0dist\YT Music Download.exe" /r:System.Windows.Forms.dll /r:System.Drawing.dll /r:System.Core.dll /r:System.Web.Extensions.dll "/r:%~dp0vendor\Microsoft.Web.WebView2.Core.dll" "/r:%~dp0vendor\Microsoft.Web.WebView2.WinForms.dll" "/resource:%~dp0vendor\Microsoft.Web.WebView2.Core.dll,Apollo.Core.dll" "/resource:%~dp0vendor\Microsoft.Web.WebView2.WinForms.dll,Apollo.WinForms.dll" "/resource:%~dp0vendor\WebView2Loader.dll,Apollo.Loader.dll" "/resource:%~dp0src\index.html,Apollo.index.html" "%~dp0src\App.cs"
+"%CSC%" /nologo /target:winexe /platform:x64 /optimize+ "/win32manifest:%~dp0src\app.manifest" "/out:%~dp0dist\YT Music Download.exe" /r:System.Windows.Forms.dll /r:System.Drawing.dll /r:System.Core.dll /r:System.Web.Extensions.dll "%~dp0src\App.cs" "%~dp0src\NativeUi.cs" "%~dp0src\AsciiDisplay.cs"
 if errorlevel 1 exit /b 1
 if exist "%~dp0dist\index.html" del /q "%~dp0dist\index.html"
 if exist "%~dp0dist\YT Music Download.exe.config" del /q "%~dp0dist\YT Music Download.exe.config"

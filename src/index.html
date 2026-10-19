@@ -40,15 +40,16 @@
         --scan: rgba(0, 0, 0, .1);
       }
       * { box-sizing: border-box; }
+      html { height: 100%; overflow: hidden; }
       body {
         min-width: 320px;
-        min-height: 100vh;
+        height: 100%;
         display: grid;
         grid-template-columns: minmax(0, 1fr);
         place-items: center;
         margin: 0;
         padding: 14px;
-        overflow-x: hidden;
+        overflow: hidden;
         background: repeating-linear-gradient(0deg, transparent 0 3px, rgba(127, 127, 127, .055) 3px 4px), var(--backdrop);
         color: var(--text);
         user-select: none;
