@@ -60,9 +60,12 @@ namespace ApolloPlaylist
 
             titleLabel = Label("YT MUSIC DOWNLOAD", 34, 29, 345, 22, boldFont);
             titleLabel.MouseDown += DragWindow;
-            themeButton = Button("LIGHT", 387, 18, 64, 42, smallFont, delegate { Theme(!lightTheme); });
-            minimizeButton = Button("_", 451, 18, 44, 42, boldFont, delegate { WindowState = FormWindowState.Minimized; });
-            closeButton = Button("×", 495, 18, 44, 42, boldFont, delegate { Close(); });
+            themeButton = Button("LIGHT", 388, 18, 63, 42, smallFont, delegate { Theme(!lightTheme); });
+            minimizeButton = Button("_", 452, 18, 43, 42, boldFont, delegate { WindowState = FormWindowState.Minimized; });
+            closeButton = Button("×", 496, 18, 43, 42, boldFont, delegate { Close(); });
+            themeButton.FlatAppearance.BorderSize = 0;
+            minimizeButton.FlatAppearance.BorderSize = 0;
+            closeButton.FlatAppearance.BorderSize = 0;
             ascii = new AsciiDisplay { Location = new Point(40, 80), Size = new Size(480, 161) };
             Controls.Add(ascii);
             urlLabel = Label("PLAYLIST URL", 51, 266, 450, 17, boldFont);
@@ -185,6 +188,9 @@ namespace ApolloPlaylist
                 g.DrawRectangle(pen, 20, 17, 519, 565);
                 g.DrawLine(pen, 21, 60, 538, 60);
                 g.DrawLine(pen, 21, 62, 538, 62);
+                g.DrawLine(pen, 387, 18, 387, 59);
+                g.DrawLine(pen, 451, 18, 451, 59);
+                g.DrawLine(pen, 495, 18, 495, 59);
                 g.DrawRectangle(pen, 40, 256, 479, 84);
                 g.DrawRectangle(pen, 40, 350, 479, 105);
                 g.DrawLine(pen, 40, 532, 519, 532);
