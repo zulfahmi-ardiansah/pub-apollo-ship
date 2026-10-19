@@ -1,0 +1,4 @@
+.playwright-mcp/
+.ram-*
+.test-output/
+.test-lyrics/

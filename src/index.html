@@ -1,0 +1,469 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark light" />
+    <link rel="icon" href="data:," />
+    <title>YT Music Download</title>
+    <style>
+      :root {
+        font-family: Consolas, "Lucida Console", "Courier New", monospace;
+        font-synthesis: none;
+      }
+      html[data-theme="dark"] {
+        --backdrop: #171717;
+        --window: #0e0e0e;
+        --surface: #1a1a1a;
+        --field: #080808;
+        --text: #f4f4f4;
+        --muted: #c2c2c2;
+        --line: #929292;
+        --accent: #f4f4f4;
+        --accent-text: #101010;
+        --bevel-light: #777;
+        --bevel-dark: #050505;
+        --scan: rgba(255, 255, 255, .13);
+      }
+      html[data-theme="light"] {
+        --backdrop: #dedede;
+        --window: #fafafa;
+        --surface: #ededed;
+        --field: #fff;
+        --text: #111;
+        --muted: #4b4b4b;
+        --line: #6f6f6f;
+        --accent: #111;
+        --accent-text: #fff;
+        --bevel-light: #fff;
+        --bevel-dark: #777;
+        --scan: rgba(0, 0, 0, .1);
+      }
+      * { box-sizing: border-box; }
+      body {
+        min-width: 320px;
+        min-height: 100vh;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        place-items: center;
+        margin: 0;
+        padding: 14px;
+        overflow-x: hidden;
+        background: repeating-linear-gradient(0deg, transparent 0 3px, rgba(127, 127, 127, .055) 3px 4px), var(--backdrop);
+        color: var(--text);
+        user-select: none;
+        -webkit-user-select: none;
+      }
+      button, input { font: inherit; }
+      button { cursor: pointer; }
+      :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+      .window {
+        width: min(100%, 520px);
+        max-width: 100%;
+        min-width: 0;
+        border: 1px solid var(--line);
+        outline: 1px solid var(--line);
+        outline-offset: 3px;
+        background: var(--window);
+        box-shadow: 7px 7px 0 rgba(0, 0, 0, .45), inset 2px 2px var(--bevel-light), inset -2px -2px var(--bevel-dark);
+      }
+      .titlebar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        min-height: 44px;
+        padding-left: 13px;
+        border-bottom: 3px double var(--line);
+        background: var(--surface);
+        box-shadow: inset 0 1px var(--bevel-light);
+        cursor: move;
+      }
+      .titlebar__name { margin: 0; font-size: 12px; font-weight: 700; letter-spacing: .08em; }
+      .titlebar__controls { display: flex; align-items: stretch; align-self: stretch; }
+      .titlebar__button {
+        min-width: 44px;
+        padding: 0 8px;
+        border: 0;
+        border-left: 1px solid var(--line);
+        border-radius: 0;
+        background: transparent;
+        color: var(--text);
+        font-size: 16px;
+        box-shadow: inset 1px 1px var(--bevel-light), inset -1px -1px var(--bevel-dark);
+        cursor: pointer;
+      }
+      .titlebar__button:hover { background: var(--window); }
+      .titlebar__button--theme { min-width: 64px; font-size: 10px; font-weight: 700; }
+      .titlebar__button--minimize::before { content: ""; display: block; width: 12px; margin: 0 auto; border-top: 2px solid currentColor; }
+      .titlebar__button--minimize.is-restoring::before { height: 10px; border: 2px solid currentColor; }
+      .body { padding: 18px 19px 19px; }
+      .ascii-display {
+        position: relative;
+        margin-bottom: 15px;
+        padding: 25px 8px 10px;
+        overflow: hidden;
+        border: 3px double var(--line);
+        background: repeating-linear-gradient(0deg, var(--field) 0 2px, var(--surface) 2px 3px);
+        text-align: center;
+        filter: grayscale(1);
+      }
+      .ascii-display::after {
+        content: "";
+        position: absolute;
+        z-index: 2;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        width: 34%;
+        transform: translateX(-110%);
+        background: linear-gradient(90deg, transparent, var(--scan), transparent);
+        pointer-events: none;
+      }
+      .ascii-display__meta {
+        position: absolute;
+        top: 6px;
+        left: 8px;
+        right: 8px;
+        display: flex;
+        justify-content: space-between;
+        color: var(--muted);
+        font-size: 9px;
+        font-weight: 700;
+        letter-spacing: .04em;
+      }
+      .ascii-display pre {
+        position: relative;
+        z-index: 1;
+        margin: 0;
+        font-family: inherit;
+        font-size: clamp(9px, 2vw, 11px);
+        font-weight: 700;
+        line-height: 1.15;
+      }
+      .ascii-display__logo { text-shadow: 1px 0 currentColor; }
+      .ascii-display__bars { min-height: 52px; padding-top: 7px; color: var(--muted); }
+      .field {
+        display: block;
+        margin-bottom: 10px;
+        padding: 9px 10px 10px;
+        border: 1px solid var(--line);
+        background: var(--surface);
+        box-shadow: inset 1px 1px var(--bevel-light), inset -1px -1px var(--bevel-dark);
+      }
+      .field__label { display: block; margin-bottom: 7px; font-size: 11px; font-weight: 700; text-transform: uppercase; }
+      .field__control { display: flex; gap: 8px; }
+      .field__input {
+        flex: 1;
+        min-width: 0;
+        height: 44px;
+        padding: 0 11px;
+        border: 1px solid var(--line);
+        border-radius: 0;
+        background: var(--field);
+        color: var(--text);
+        font-size: 12px;
+        user-select: text;
+        -webkit-user-select: text;
+      }
+      .field__button {
+        min-width: 72px;
+        padding: 0 10px;
+        border: 1px solid var(--line);
+        border-radius: 0;
+        background: var(--window);
+        color: var(--text);
+        font-size: 11px;
+        font-weight: 700;
+        box-shadow: inset 1px 1px var(--bevel-light), inset -1px -1px var(--bevel-dark);
+      }
+      .field__button:hover { background: var(--field); }
+      .field__note { display: block; margin-top: 6px; color: var(--muted); font-size: 11px; line-height: 1.4; }
+      .action-row { display: flex; align-items: center; gap: 14px; margin-top: 15px; }
+      .start {
+        min-height: 44px;
+        padding: 0 22px;
+        border: 1px solid var(--accent);
+        border-radius: 0;
+        background: var(--accent);
+        color: var(--accent-text);
+        font-size: 12px;
+        font-weight: 700;
+        box-shadow: inset 2px 2px var(--bevel-light), inset -2px -2px var(--bevel-dark), 3px 3px 0 var(--bevel-dark);
+      }
+      .start:hover:not(:disabled) { filter: brightness(.88); }
+      .start:disabled { cursor: wait; opacity: .65; }
+      .format { color: var(--muted); font-size: 11px; }
+      .status {
+        min-height: 20px;
+        margin: 0;
+        color: var(--muted);
+        font-size: 11px;
+        line-height: 1.5;
+      }
+      .bottom-row { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 6px; max-width: 100%; margin-top: 17px; padding-top: 10px; border-top: 1px dashed var(--line); }
+      .bottom-row::before { content: ">"; color: var(--text); font-size: 11px; }
+      .bottom-row .status { width: 100%; max-width: 100%; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+      .status[data-state="error"] { color: var(--text); font-weight: 700; }
+      .closed {
+        padding: 18px;
+        border: 1px solid var(--line);
+        background: var(--window);
+        text-align: center;
+        font-size: 12px;
+      }
+      .closed button {
+        margin-top: 12px;
+        padding: 8px 12px;
+        border: 1px solid var(--line);
+        border-radius: 0;
+        background: var(--surface);
+        color: var(--text);
+      }
+      [hidden] { display: none !important; }
+      @keyframes scan { to { transform: translateX(310%); } }
+      @media (prefers-reduced-motion: no-preference) {
+        .ascii-display::after { animation: scan 3.6s linear infinite; }
+      }
+      @media (max-width: 440px) {
+        .body { padding: 16px 14px; }
+        .titlebar__name { font-size: 11px; }
+        .action-row { justify-content: space-between; }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="window" id="window">
+      <header class="titlebar">
+        <h1 class="titlebar__name">YT Music Download</h1>
+        <div class="titlebar__controls">
+          <button class="titlebar__button titlebar__button--theme" id="theme-button" type="button" aria-label="Switch to light theme">LIGHT</button>
+          <button class="titlebar__button titlebar__button--minimize" id="minimize-button" type="button" aria-label="Minimize window" title="Minimize"></button>
+          <button class="titlebar__button" id="close-button" type="button" aria-label="Close window" title="Close">Ã—</button>
+        </div>
+      </header>
+      <div class="body" id="window-body">
+        <div class="ascii-display" aria-hidden="true">
+          <div class="ascii-display__meta"><span>APOLLO / AUDIO</span><span>OUTPUT: M4A</span></div>
+          <pre class="ascii-display__logo">    _    ____   ___  _     _      ___
+   / \  |  _ \ / _ \| |   | |    / _ \
+  / _ \ | |_) | | | | |   | |   | | | |
+ / ___ \|  __/| |_| | |___| |___| |_| |
+/_/   \_\_|    \___/|_____|_____\___/</pre>
+          <pre class="ascii-display__bars" id="ascii-bars"></pre>
+        </div>
+        <form id="download-form" novalidate>
+          <div class="field">
+            <label class="field__label" for="playlist-url">Playlist URL</label>
+            <div class="field__control">
+              <input class="field__input" id="playlist-url" name="playlistUrl" type="url" required spellcheck="false" autocomplete="off" />
+              <button class="field__button" id="paste-button" type="button">Paste</button>
+            </div>
+          </div>
+          <div class="field">
+            <label class="field__label" for="output-folder">Save to folder</label>
+            <div class="field__control">
+              <input class="field__input" id="output-folder" name="outputFolder" type="text" required spellcheck="false" />
+              <button class="field__button" id="browse-button" type="button">Browse</button>
+            </div>
+            <span class="field__note">Artist - Album / track number - title.m4a</span>
+          </div>
+          <div class="action-row">
+            <button class="start" id="start-button" type="submit">Download</button>
+            <span class="format">M4A Â· cover Â· lyrics Â· subtitles</span>
+          </div>
+        </form>
+        <div class="bottom-row">
+          <p class="status" id="status" role="status" aria-live="polite">Template preview. Downloader not connected yet.</p>
+        </div>
+      </div>
+    </main>
+    <div class="closed" id="closed-preview" hidden>Window closed in preview.<br /><button id="reopen-button" type="button">Reopen</button></div>
+    <script>
+      const root = document.documentElement;
+      const appWindow = document.querySelector('#window');
+      const body = document.querySelector('#window-body');
+      const themeButton = document.querySelector('#theme-button');
+      const minimizeButton = document.querySelector('#minimize-button');
+      const closeButton = document.querySelector('#close-button');
+      const closedPreview = document.querySelector('#closed-preview');
+      const status = document.querySelector('#status');
+      const form = document.querySelector('#download-form');
+      const startButton = document.querySelector('#start-button');
+      const playlistInput = document.querySelector('#playlist-url');
+      const folderInput = document.querySelector('#output-folder');
+      const pasteButton = document.querySelector('#paste-button');
+      const browseButton = document.querySelector('#browse-button');
+      const asciiBars = document.querySelector('#ascii-bars');
+      const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+      let animationTimer;
+      let animationStep = 0;
+      let downloading = false;
+
+      if (window.chrome?.webview) {
+        let nextId = 0;
+        const pending = new Map();
+        const request = (type, payload = {}) => new Promise((resolve, reject) => {
+          const id = ++nextId;
+          pending.set(id, { resolve, reject });
+          chrome.webview.postMessage({ type, id, ...payload });
+        });
+        window.apolloWindow = {
+          minimize: () => chrome.webview.postMessage({ type: 'minimize' }),
+          close: () => chrome.webview.postMessage({ type: 'close' }),
+          paste: () => request('paste'),
+          browse: (folder) => request('browse', { folder }),
+        };
+        window.apolloDownloader = {
+          download: ({ url, folder }) => request('download', { url, folder }),
+          cancel: () => chrome.webview.postMessage({ type: 'cancel' }),
+        };
+        chrome.webview.addEventListener('message', ({ data }) => {
+          if (data.type === 'ready') {
+            setStatus('Ready. Enter a playlist URL and choose a folder.');
+          } else if (data.type === 'progress') {
+            setStatus(data.message, 'loading');
+          } else if (data.type === 'result') {
+            const request = pending.get(data.id);
+            if (!request) return;
+            pending.delete(data.id);
+            if (data.ok) request.resolve(data.value);
+            else request.reject(new Error(data.error));
+          }
+        });
+        document.querySelector('.titlebar').addEventListener('mousedown', (event) => {
+          if (event.button === 0 && !event.target.closest('.titlebar__controls')) {
+            chrome.webview.postMessage({ type: 'drag' });
+          }
+        });
+      }
+      document.addEventListener('contextmenu', (event) => {
+        if (!event.target.closest('.field__input')) event.preventDefault();
+      });
+
+      function drawAsciiBars() {
+        const rows = Array.from({ length: 4 }, (_, row) => {
+          const bars = Array.from({ length: 32 }, (_, column) => {
+            const wave = Math.sin(column * .48 + animationStep * .35);
+            const echo = Math.sin(column * .91 - animationStep * .22);
+            const height = Math.max(0, Math.min(4, Math.round(2 + wave + echo)));
+            return height > 3 - row ? '|' : ' ';
+          });
+          return `| ${bars.join('')} |`;
+        });
+        asciiBars.textContent = rows.join('\n');
+        animationStep += 1;
+      }
+
+      function syncAsciiAnimation() {
+        clearInterval(animationTimer);
+        animationTimer = undefined;
+        drawAsciiBars();
+        if (!reducedMotion.matches && !body.hidden && !appWindow.hidden) {
+          animationTimer = setInterval(drawAsciiBars, 150);
+        }
+      }
+      reducedMotion.addEventListener('change', syncAsciiAnimation);
+      syncAsciiAnimation();
+
+      function setStatus(message, state = 'idle') {
+        status.textContent = message;
+        status.title = message;
+        status.dataset.state = state;
+      }
+
+      themeButton.addEventListener('click', () => {
+        const next = root.dataset.theme === 'dark' ? 'light' : 'dark';
+        root.dataset.theme = next;
+        themeButton.textContent = next === 'dark' ? 'LIGHT' : 'DARK';
+        themeButton.setAttribute('aria-label', `Switch to ${next === 'dark' ? 'light' : 'dark'} theme`);
+      });
+
+      pasteButton.addEventListener('click', async () => {
+        try {
+          const value = window.apolloWindow?.paste
+            ? await window.apolloWindow.paste()
+            : await navigator.clipboard.readText();
+          if (!value?.trim()) return setStatus('Clipboard has no text.', 'error');
+          playlistInput.value = value.trim();
+          playlistInput.focus();
+          setStatus('Playlist URL pasted.');
+        } catch (error) {
+          setStatus(error?.message || 'Clipboard is unavailable.', 'error');
+        }
+      });
+
+      browseButton.addEventListener('click', async () => {
+        if (!window.apolloWindow?.browse) {
+          return setStatus('Folder picker is available in the desktop app.', 'error');
+        }
+        try {
+          const folder = await window.apolloWindow.browse(folderInput.value.trim());
+          if (folder) {
+            folderInput.value = folder;
+            folderInput.focus();
+            setStatus('Folder selected.');
+          }
+        } catch (error) {
+          setStatus(error?.message || 'Could not open the folder picker.', 'error');
+        }
+      });
+
+      minimizeButton.addEventListener('click', () => {
+        if (window.apolloWindow?.minimize) return window.apolloWindow.minimize();
+        body.hidden = !body.hidden;
+        minimizeButton.classList.toggle('is-restoring', body.hidden);
+        minimizeButton.setAttribute('aria-label', body.hidden ? 'Restore window' : 'Minimize window');
+        minimizeButton.title = body.hidden ? 'Restore' : 'Minimize';
+        syncAsciiAnimation();
+      });
+
+      closeButton.addEventListener('click', () => {
+        if (window.apolloWindow?.close) return window.apolloWindow.close();
+        appWindow.hidden = true;
+        closedPreview.hidden = false;
+        syncAsciiAnimation();
+        document.querySelector('#reopen-button').focus();
+      });
+      document.querySelector('#reopen-button').addEventListener('click', () => {
+        appWindow.hidden = false;
+        closedPreview.hidden = true;
+        syncAsciiAnimation();
+        closeButton.focus();
+      });
+
+      form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        if (downloading) {
+          window.apolloDownloader.cancel();
+          startButton.disabled = true;
+          setStatus('Stopping downloadâ€¦', 'loading');
+          return;
+        }
+        const url = playlistInput.value.trim();
+        const folder = folderInput.value.trim();
+        if (!url || !/^https?:\/\//i.test(url)) return setStatus('Enter a valid playlist URL.', 'error');
+        if (!folder) return setStatus('Enter a destination folder.', 'error');
+        if (!window.apolloDownloader?.download) return setStatus('Desktop downloader is not connected yet.', 'error');
+        downloading = true;
+        startButton.textContent = 'Stop';
+        setStatus('Downloadingâ€¦', 'loading');
+        try {
+          const result = await window.apolloDownloader.download({ url, folder });
+          const lyricStatus = result?.tracks
+            ? ` Lyrics added: ${result.lyricsAdded}/${result.tracks}.`
+              + (result.lyricsUnavailable ? ` No LRCLIB match for ${result.lyricsUnavailable}.` : '')
+              + (result.lyricsFailed ? ` Failed for ${result.lyricsFailed}: ${result.lyricsError}` : '')
+            : ' No audio files reported for lyrics.';
+          const folderStatus = result?.openError ? ` Could not open folder: ${result.openError}` : '';
+          setStatus(`Download complete.${lyricStatus}${folderStatus}`, result?.lyricsFailed || result?.openError ? 'error' : 'idle');
+        } catch (error) {
+          setStatus(error?.message || 'Download failed. Please try again.', 'error');
+        } finally {
+          downloading = false;
+          startButton.textContent = 'Download';
+          startButton.disabled = false;
+        }
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,13 @@
+yt-dlp ^
+  -f "bestaudio[ext=m4a]/bestaudio" ^
+  -x --audio-format m4a ^
+  --embed-metadata ^
+  --embed-thumbnail ^
+  --write-subs ^
+  --write-auto-subs ^
+  --sub-langs "en.*,ja.*,id.*" ^
+  --convert-subs srt ^
+  --parse-metadata "%(uploader|)s:%(meta_album_artist)s" ^
+  --parse-metadata "%(playlist_index)s:%(meta_track)s" ^
+  -o "%(playlist_uploader,uploader|Unknown Artist)s - %(album,playlist_title|Unknown Album)s\%(playlist_index)02d - %(title)s.%(ext)s" ^
+  "https://music.youtube.com/playlist?list=OLAK5uy_ksLeWF_A51TSyGwHyIFFSFdvdhaaTUj5U"
