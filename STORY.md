@@ -28,7 +28,7 @@ Lyrics needed a separate path. The SRT files from YouTube Music were not a relia
 
 ## Returning to native Windows controls
 
-Before changing the desktop implementation again, we initialized local Git and saved the WebView2 version. Then we replaced the browser window with a WinForms interface in [src/NativeUi.cs](src/NativeUi.cs), while [src/AsciiDisplay.cs](src/AsciiDisplay.cs) drew the ASCII display. The downloader and lyric work stayed in [src/App.cs](src/App.cs).
+Before changing the desktop implementation again, we initialized local Git and saved the WebView2 version. Then we replaced the browser window with a WinForms interface in [src/NativeUi.cs](src/NativeUi.cs), while a custom `AsciiDisplay.cs` control drew the ASCII display. The downloader and lyric work stayed in [src/App.cs](src/App.cs).
 
 That change removed the browser runtime from the running UI and made the output much smaller: the first native EXE was 36,352 bytes. We kept the fixed window, themes, ASCII animation, custom title bar, Paste and Browse controls, and progress behavior. Later passes simplified the title-bar button borders, named the app **Apollo Ship**, added the Ready / Process / Complete indicator, and renamed the packaged file to `Apollo-Ship.exe`.
 
@@ -38,8 +38,10 @@ The first memory concern was the browser-based version, but we also noticed the 
 
 Over 40 seconds, the animation-on probe's managed heap grew by about 4 MB; the animation-off probe grew by about 1 MB. We then cached the static display and drew only the moving bars each frame. In the same probe, animation-on growth fell to about 1.9 MB. An accelerated run showed the managed heap dropping from 6.4 MB to 1.4 MB when garbage collection ran. That showed temporary redraw allocations being reclaimed; it did not establish an unbounded leak or promise a flat Task Manager reading from the first second.
 
+Later, we removed the light theme and replaced the custom display control with an embedded [animated GIF](src/ascii.gif). The download state remains a separate text label so it can still change between Ready, Process, and Complete. The HTML preview uses the same GIF and a still frame for reduced-motion settings. This removes the app's own frame timer and drawing code; Windows still paints the GIF frames.
+
 ## Where it stands
 
 Apollo Ship now also plays a short loop from [sound.ogg](sound.ogg) while its window is open. The build converts that source to WAV and embeds it, so playback needs no separate audio file.
 
-Apollo Ship is a single [Windows EXE](dist/Apollo-Ship.exe) built by [build.cmd](build.cmd). The current file is 936,448 bytes, below the 1 MB launcher target. The embedded sound now uses 28 kHz stereo PCM for better quality within that limit. yt-dlp, FFmpeg, and FFprobe remain external tools for downloading, and FFmpeg is needed when building the embedded sound. The native app is the runnable product; the HTML file is a design preview. [README.md](README.md) covers setup and use, while this file records why the app took this route.
+Apollo Ship is a single [Windows EXE](dist/Apollo-Ship.exe) built by [build.cmd](build.cmd). The current file is 969,728 bytes, below the 1 MB launcher target. The embedded sound uses 28 kHz stereo PCM. yt-dlp, FFmpeg, and FFprobe remain external tools for downloading, and FFmpeg is needed when building the embedded sound. The native app is the runnable product; the HTML file is a design preview. [README.md](README.md) covers setup and use, while this file records why the app took this route.

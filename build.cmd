@@ -9,6 +9,10 @@ if not exist "%~dp0sound.ogg" (
   echo sound.ogg was not found.
   exit /b 1
 )
+if not exist "%~dp0src\ascii.gif" (
+  echo ascii.gif was not found.
+  exit /b 1
+)
 where ffmpeg >nul 2>&1
 if errorlevel 1 (
   echo FFmpeg is required on PATH to build the embedded audio.
@@ -21,7 +25,7 @@ if errorlevel 1 (
   exit /b 1
 )
 if not exist "%~dp0dist" mkdir "%~dp0dist"
-"%CSC%" /nologo /target:winexe /platform:x64 /optimize+ "/win32manifest:%~dp0src\app.manifest" "/out:%~dp0dist\Apollo-Ship.exe" "/resource:%AUDIO_WAV%,ApolloShip.Loop" /r:System.Windows.Forms.dll /r:System.Drawing.dll /r:System.Core.dll /r:System.Web.Extensions.dll "%~dp0src\App.cs" "%~dp0src\NativeUi.cs" "%~dp0src\AsciiDisplay.cs"
+"%CSC%" /nologo /target:winexe /platform:x64 /optimize+ "/win32manifest:%~dp0src\app.manifest" "/out:%~dp0dist\Apollo-Ship.exe" "/resource:%AUDIO_WAV%,ApolloShip.Loop" "/resource:%~dp0src\ascii.gif,ApolloShip.Ascii" /r:System.Windows.Forms.dll /r:System.Drawing.dll /r:System.Core.dll /r:System.Web.Extensions.dll "%~dp0src\App.cs" "%~dp0src\NativeUi.cs"
 set "BUILD_RESULT=%ERRORLEVEL%"
 del /q "%AUDIO_WAV%"
 if not "%BUILD_RESULT%"=="0" exit /b %BUILD_RESULT%

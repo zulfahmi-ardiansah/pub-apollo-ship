@@ -16,7 +16,7 @@ Apollo Ship accepts a playlist URL. It does not sign in to YouTube or use a Prem
 3. Apollo Ship looks up each downloaded track on LRCLIB. When the title, artist, album, and duration match, it uses FFmpeg to embed plain lyrics in the M4A. A track without a match keeps its audio unchanged.
 4. When processing finishes, the destination opens in File Explorer.
 
-The window shows one-line progress and lets you stop a download. It has a fixed size, a dark default theme, a light theme, animated ASCII art, and a looping sound while it is open. The sound is inside the EXE. The UI uses native Windows controls, so it does not need a browser runtime.
+The window shows one-line progress and lets you stop a download. It has a fixed size, a dark theme, an animated ASCII GIF, and a looping sound while it is open. The GIF and sound are inside the EXE. The UI uses native Windows controls, so it does not need a browser runtime.
 
 ## Requirements
 
@@ -63,7 +63,7 @@ Run this from the repository root in PowerShell:
 .\build.cmd
 ```
 
-The script uses the Windows .NET Framework compiler and FFmpeg on `PATH` to convert [sound.ogg](sound.ogg) into an embedded WAV resource. It creates one x64 EXE in `dist` and fails if the EXE exceeds 1 MB. FFmpeg is needed to build the sound, but the finished EXE plays it without an external audio file or decoder.
+The script uses the Windows .NET Framework compiler and FFmpeg on `PATH` to convert [sound.ogg](sound.ogg) into an embedded WAV resource. It embeds [src/ascii.gif](src/ascii.gif), creates one x64 EXE in `dist`, and fails if the EXE exceeds 1 MB. FFmpeg is needed to build the sound, but the finished EXE plays it without an external audio file or decoder. To regenerate the GIF and preview still image, run `python tools/ascii.py` with Pillow installed.
 
 There is no automated test suite in this repository. A successful build confirms compilation and the EXE size check; it does not test a live playlist download.
 
@@ -72,7 +72,9 @@ There is no automated test suite in this repository. A successful build confirms
 | Path | Purpose |
 | --- | --- |
 | [src/NativeUi.cs](src/NativeUi.cs) | Native Windows window and controls. |
-| [src/AsciiDisplay.cs](src/AsciiDisplay.cs) | Animated ASCII display. |
+| [src/ascii.gif](src/ascii.gif) | Animated ASCII display embedded in the EXE. |
+| [src/ascii.png](src/ascii.png) | Still frame used by the HTML preview when reduced motion is requested. |
+| [tools/ascii.py](tools/ascii.py) | Regenerates the GIF and reduced-motion preview image. |
 | [src/App.cs](src/App.cs) | Download process and lyric embedding. |
 | [sound.ogg](sound.ogg) | Source audio embedded in the EXE during the build. |
 | [src/index.html](src/index.html) | Standalone visual preview; the EXE does not load it. |

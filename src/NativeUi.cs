@@ -36,19 +36,19 @@ namespace ApolloPlaylist
         private volatile bool cancelRequested;
         private string lastError = "";
         private readonly JavaScriptSerializer uiJson = new JavaScriptSerializer();
-        private readonly System.Windows.Forms.Timer animation = new System.Windows.Forms.Timer();
         private readonly ToolTip statusTip = new ToolTip();
         private readonly Font smallFont = new Font("Consolas", 8f);
         private readonly Font normalFont = new Font("Consolas", 9f);
         private readonly Font boldFont = new Font("Consolas", 9f, FontStyle.Bold);
-        private readonly Label titleLabel, urlLabel, folderLabel, noteLabel, formatLabel, statusLabel, statusArrow;
+        private readonly Label titleLabel, urlLabel, folderLabel, noteLabel, formatLabel, statusLabel, statusArrow, displayState;
         private readonly TextBox urlInput, folderInput;
         private readonly Panel urlBox, folderBox;
-        private readonly Button themeButton, minimizeButton, closeButton, pasteButton, browseButton, startButton;
-        private readonly AsciiDisplay ascii;
+        private readonly Button minimizeButton, closeButton, pasteButton, browseButton, startButton;
+        private readonly PictureBox ascii;
+        private readonly Stream displayStream;
+        private readonly Image displayImage;
         private SoundPlayer loopPlayer;
         private Stream loopStream;
-        private bool lightTheme;
         private bool downloading;
 
         internal PlaylistWindow()
@@ -63,15 +63,18 @@ namespace ApolloPlaylist
             DoubleBuffered = true;
             KeyPreview = true;
 
-            titleLabel = Label("APOLLO SHIP", 34, 29, 345, 22, boldFont);
+            titleLabel = Label("APOLLO SHIP", 34, 29, 410, 22, boldFont);
             titleLabel.MouseDown += DragWindow;
-            themeButton = Button("LIGHT", 388, 18, 63, 42, smallFont, delegate { Theme(!lightTheme); });
             minimizeButton = Button("_", 452, 18, 43, 42, boldFont, delegate { WindowState = FormWindowState.Minimized; });
             closeButton = Button("×", 496, 18, 43, 42, boldFont, delegate { Close(); });
-            themeButton.FlatAppearance.BorderSize = 0;
             minimizeButton.FlatAppearance.BorderSize = 0;
             closeButton.FlatAppearance.BorderSize = 0;
-            ascii = new AsciiDisplay { Location = new Point(40, 80), Size = new Size(480, 161) };
+            displayStream = Assembly.GetExecutingAssembly().GetManifestResourceStream("ApolloShip.Ascii");
+            if (displayStream == null) throw new InvalidOperationException("Embedded display was not found.");
+            displayImage = Image.FromStream(displayStream);
+            ascii = new PictureBox { Location = new Point(40, 80), Size = new Size(480, 161), Image = displayImage, SizeMode = PictureBoxSizeMode.Normal, TabStop = false };
+            displayState = new Label { Text = "\u25CF Ready", Location = new Point(350, 8), Size = new Size(116, 15), TextAlign = ContentAlignment.MiddleRight, BackColor = Color.FromArgb(8, 8, 8), ForeColor = Color.FromArgb(194, 194, 194), Font = smallFont };
+            ascii.Controls.Add(displayState);
             Controls.Add(ascii);
             urlLabel = Label("PLAYLIST URL", 51, 266, 450, 17, boldFont);
             urlBox = Input(51, 285, out urlInput);
@@ -87,14 +90,11 @@ namespace ApolloPlaylist
             statusLabel.AutoEllipsis = true;
             statusTip.SetToolTip(statusLabel, statusLabel.Text);
 
-            animation.Interval = 150;
-            animation.Tick += delegate { ascii.Advance(); };
-            animation.Start();
-            Resize += delegate { animation.Enabled = WindowState != FormWindowState.Minimized; };
             Shown += delegate { StartLoopSound(); };
             FormClosing += delegate { StopLoopSound(); StopDownload(); };
+            FormClosed += delegate { ascii.Image = null; displayImage.Dispose(); displayStream.Dispose(); };
             KeyDown += delegate(object sender, KeyEventArgs args) { if (args.KeyCode == Keys.Escape && !downloading) Close(); };
-            Theme(false);
+            ApplyDarkTheme();
         }
 
         private void StartLoopSound()
@@ -159,16 +159,15 @@ namespace ApolloPlaylist
             return host;
         }
 
-        private void Theme(bool light)
+        private void ApplyDarkTheme()
         {
-            lightTheme = light;
-            Color backdrop = light ? Color.FromArgb(222, 222, 222) : Color.FromArgb(23, 23, 23);
-            Color surface = light ? Color.FromArgb(237, 237, 237) : Color.FromArgb(26, 26, 26);
-            Color window = light ? Color.FromArgb(250, 250, 250) : Color.FromArgb(14, 14, 14);
-            Color field = light ? Color.White : Color.FromArgb(8, 8, 8);
-            Color ink = light ? Color.FromArgb(17, 17, 17) : Color.FromArgb(244, 244, 244);
-            Color muted = light ? Color.FromArgb(75, 75, 75) : Color.FromArgb(194, 194, 194);
-            Color line = light ? Color.FromArgb(111, 111, 111) : Color.FromArgb(146, 146, 146);
+            Color backdrop = Color.FromArgb(23, 23, 23);
+            Color surface = Color.FromArgb(26, 26, 26);
+            Color window = Color.FromArgb(14, 14, 14);
+            Color field = Color.FromArgb(8, 8, 8);
+            Color ink = Color.FromArgb(244, 244, 244);
+            Color muted = Color.FromArgb(194, 194, 194);
+            Color line = Color.FromArgb(146, 146, 146);
             BackColor = backdrop;
             foreach (Label label in new[] { titleLabel, urlLabel, folderLabel, noteLabel, formatLabel, statusLabel, statusArrow })
             {
@@ -178,9 +177,9 @@ namespace ApolloPlaylist
             }
             foreach (Panel host in new[] { urlBox, folderBox }) { host.BackColor = field; host.ForeColor = line; }
             foreach (TextBox input in new[] { urlInput, folderInput }) { input.BackColor = field; input.ForeColor = ink; }
-            foreach (Button button in new[] { themeButton, minimizeButton, closeButton, pasteButton, browseButton })
+            foreach (Button button in new[] { minimizeButton, closeButton, pasteButton, browseButton })
             {
-                button.BackColor = button == themeButton || button == minimizeButton || button == closeButton ? surface : window;
+                button.BackColor = button == minimizeButton || button == closeButton ? surface : window;
                 button.ForeColor = ink;
                 button.FlatAppearance.BorderColor = line;
                 button.FlatAppearance.MouseOverBackColor = field;
@@ -188,8 +187,6 @@ namespace ApolloPlaylist
             startButton.BackColor = ink;
             startButton.ForeColor = window;
             startButton.FlatAppearance.BorderColor = ink;
-            themeButton.Text = light ? "DARK" : "LIGHT";
-            ascii.Light = light;
             Invalidate();
         }
 
@@ -203,16 +200,16 @@ namespace ApolloPlaylist
         protected override void OnMouseDown(MouseEventArgs args)
         {
             base.OnMouseDown(args);
-            if (args.Y >= 18 && args.Y <= 60 && args.X < 387) DragWindow(this, args);
+            if (args.Y >= 18 && args.Y <= 60 && args.X < 451) DragWindow(this, args);
         }
 
         protected override void OnPaint(PaintEventArgs args)
         {
             base.OnPaint(args);
             Graphics g = args.Graphics;
-            Color line = lightTheme ? Color.FromArgb(111, 111, 111) : Color.FromArgb(146, 146, 146);
-            Color surface = lightTheme ? Color.FromArgb(237, 237, 237) : Color.FromArgb(26, 26, 26);
-            Color window = lightTheme ? Color.FromArgb(250, 250, 250) : Color.FromArgb(14, 14, 14);
+            Color line = Color.FromArgb(146, 146, 146);
+            Color surface = Color.FromArgb(26, 26, 26);
+            Color window = Color.FromArgb(14, 14, 14);
             using (SolidBrush fill = new SolidBrush(window)) g.FillRectangle(fill, 20, 17, 520, 566);
             using (SolidBrush fill = new SolidBrush(surface)) g.FillRectangle(fill, 21, 18, 518, 44);
             using (SolidBrush fill = new SolidBrush(surface))
@@ -226,7 +223,6 @@ namespace ApolloPlaylist
                 g.DrawRectangle(pen, 20, 17, 519, 565);
                 g.DrawLine(pen, 21, 60, 538, 60);
                 g.DrawLine(pen, 21, 62, 538, 62);
-                g.DrawLine(pen, 387, 18, 387, 59);
                 g.DrawLine(pen, 451, 18, 451, 59);
                 g.DrawLine(pen, 495, 18, 495, 59);
                 g.DrawRectangle(pen, 40, 256, 479, 84);
@@ -283,8 +279,7 @@ namespace ApolloPlaylist
             if (folder.Length == 0) { SetStatus("Enter a destination folder."); return; }
             downloading = true;
             startButton.Text = "Stop";
-            ascii.State = AsciiDisplay.DisplayState.Process;
-            ascii.Invalidate();
+            displayState.Text = "\u25B6 Process";
             SetStatus("Downloading…");
             StartDownload(++downloadId, url, folder);
         }
@@ -302,13 +297,11 @@ namespace ApolloPlaylist
             startButton.Enabled = true;
             if (!Convert.ToBoolean(data["ok"]))
             {
-                ascii.State = AsciiDisplay.DisplayState.Ready;
-                ascii.Invalidate();
+                displayState.Text = "\u25CF Ready";
                 SetStatus(Convert.ToString(data["error"]));
                 return;
             }
-            ascii.State = AsciiDisplay.DisplayState.Complete;
-            ascii.Invalidate();
+            displayState.Text = "\u25CF Complete";
             Dictionary<string, object> value = data["value"] as Dictionary<string, object>;
             int tracks = ResultCount(value, "tracks");
             string summary = tracks > 0
